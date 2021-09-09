@@ -4,13 +4,14 @@ Shared Github Actions for ioBroker testing workflows: Deploy step
 
 ## Inputs
 
-| Input           | Description                                                        | Required? |      Default      |
-| --------------- | ------------------------------------------------------------------ | --------- | :---------------: |
-| `node-version`  | Node.js version to use in tests. Should be LTS.                    | ✔         |         -         |
-| `build`         | Set to `'true'` when the adapter needs a build step before testing | ❌        |     `'false'`     |
-| `build-command` | Overwrite the default build command                                | ❌        | `'npm run build'` |
-| `npm-token`     | The token to use to publish to npm                                 | ✔         |         -         |
-| `github-token`  | The token to use to create a GitHub release                        | ✔         |         -         |
+| Input             | Description                                                        | Required? |      Default      |
+| ----------------- | ------------------------------------------------------------------ | --------- | :---------------: |
+| `node-version`    | Node.js version to use in tests. Should be LTS.                    | ✔         |         -         |
+| `install-command` | Overwrite the default install command                              | ❌        |    `'npm ci'`     |
+| `build`           | Set to `'true'` when the adapter needs a build step before testing | ❌        |     `'false'`     |
+| `build-command`   | Overwrite the default build command                                | ❌        | `'npm run build'` |
+| `npm-token`       | The token to use to publish to npm                                 | ✔         |         -         |
+| `github-token`    | The token to use to create a GitHub release                        | ✔         |         -         |
 
 ## Usage
 
@@ -32,7 +33,7 @@ jobs:
     steps:
       - uses: AlCalzone/iobroker-testing-action-deploy@v1
         with:
-          node-version: '14.x' # This should be LTS
+          node-version: "14.x" # This should be LTS
           # build: 'true' # optional
           npm-token: ${{ secrets.NPM_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

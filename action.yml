@@ -6,6 +6,9 @@ inputs:
   node-version:
     description: "Node.js version"
     required: true
+  install-command:
+    description: "Overwrite the default install command"
+    default: "npm ci"
   build:
     description: "Set to true when the adapter needs a build step"
     default: "false"
@@ -50,7 +53,7 @@ runs:
 
     - name: Install Dependencies
       shell: bash
-      run: npm ci
+      run: ${{ inputs.install-command }}
 
     - name: Create a clean build
       shell: bash
