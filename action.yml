@@ -1,0 +1,83 @@
+name: "ioBroker Testing: Deploy"
+author: "AlCalzone"
+#description: 'Greet someone'
+
+inputs:
+  node-version:
+    description: "Node.js version"
+    required: true
+  build:
+    description: "Set to true when the adapter needs a build step"
+    default: "false"
+  build-command:
+    description: "Overwrite the default build command"
+    default: "npm run build"
+  npm-token:
+    description: "The token to use to publish to npm"
+    required: true
+  github-token:
+    description: "The token to use to create a GitHub release"
+    required: true
+
+# Conditional syntax isn't supported, but there are workarounds:
+# https://github.com/actions/runner/issues/834#issuecomment-909921245
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: "npm"
+
+    - name: Extract the version and commit body from the tag
+      shell: bash
+      id: extract_release
+      # The body may be multiline, therefore newlines and % need to be escaped
+      run: |
+        VERSION="${{ github.ref }}"
+        VERSION=${VERSION##*/v}
+        echo "::set-output name=VERSION::$VERSION"
+        BODY=$(git show -s --format=%b)
+        BODY="${BODY//'%'/'%25'}"
+        BODY="${BODY//$'\n'/'%0A'}"
+        BODY="${BODY//$'\r'/'%0D'}"
+        echo "::set-output name=BODY::$BODY"
+
+    - name: Install Dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Create a clean build
+      shell: bash
+      run: |
+        if ${{ inputs.build }}; then
+          ${{ inputs.build-command }}
+        else
+          echo "Skipping build step..."
+        fi
+
+    - name: Publish package to npm
+      shell: bash
+      run: |
+        npm config set //registry.npmjs.org/:_authToken=${{ inputs.npm-token }}
+        npm whoami
+        npm publish
+
+    - name: Create Github Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release v${{ steps.extract_release.outputs.VERSION }}
+        draft: false
+        # Prerelease versions create prereleases on Github
+        prerelease: ${{ contains(steps.extract_release.outputs.VERSION, '-') }}
+        body: ${{ steps.extract_release.outputs.BODY }}
+
+    # TODO: Sentry
