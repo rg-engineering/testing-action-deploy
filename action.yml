@@ -116,15 +116,15 @@ runs:
           exit 0
         fi
 
-        if ! ${{ inputs.sentry-token }}; then
+        if [[ "${{ inputs.sentry-token }}" == "false" ]] ; then
           echo "::error::Required input sentry-token not provided!"
           exit 1
         fi
-        if ! ${{ inputs.sentry-project }} ; then
+        if [[ "${{ inputs.sentry-project }}" == "false" ]] ; then
           echo "::error::Required input sentry-project not provided!"
           exit 1
         fi
-        if ! ${{ inputs.sentry-version-prefix }}; then
+        if [[ "${{ inputs.sentry-version-prefix }}" == "false" ]] ; then
           echo "::error::Required input sentry-version-prefix not provided!"
           exit 1
         fi
