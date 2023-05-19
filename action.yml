@@ -9,6 +9,9 @@ inputs:
   install-command:
     description: "Overwrite the default install command"
     default: "npm ci"
+  package-cache:
+    description: "Define which package manager to use for dependency caching. Set to 'false' to disable caching."
+    default: 'npm'
   build:
     description: "Set to true when the adapter needs a build step"
     default: false
@@ -60,7 +63,7 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
-        cache: "npm"
+        cache: ${{ (inputs.package-cache != 'false' && inputs.package-cache != '') && inputs.package-cache || '' }}
 
     - name: Extract the version and commit body from the tag
       shell: bash
