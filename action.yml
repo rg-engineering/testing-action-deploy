@@ -78,6 +78,9 @@ runs:
         echo "BODY<<$EOF" >> $GITHUB_OUTPUT
         echo "$BODY" >> $GITHUB_OUTPUT
         echo "$EOF" >> $GITHUB_OUTPUT
+        if [[ $VERSION == *"-"* ]] ; then
+          echo "TAG=--tag next" >> $GITHUB_OUTPUT
+        fi
 
     - name: Install Dependencies
       shell: bash
@@ -97,7 +100,7 @@ runs:
       run: |
         npm config set //registry.npmjs.org/:_authToken=${{ inputs.npm-token }}
         npm whoami
-        npm publish
+        npm publish $TAG
 
     - name: Create Github Release
       uses: softprops/action-gh-release@v1
