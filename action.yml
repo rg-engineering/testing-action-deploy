@@ -100,7 +100,7 @@ runs:
       run: |
         npm config set //registry.npmjs.org/:_authToken=${{ inputs.npm-token }}
         npm whoami
-        npm publish $TAG
+        npm publish ${{ steps.extract_release.outputs.TAG }}
 
     - name: Create Github Release
       uses: softprops/action-gh-release@v1
